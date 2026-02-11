@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Будешь моей валентинкой?</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #ffeef2;
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        #main-container {
+            position: relative;
+            z-index: 10;
+        }
+
+        h1 {
+            color: #d63384;
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+
+        .emojis {
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        button {
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.2s, background-color 0.3s;
+        }
+
+        #yes-btn {
+            background-color: #ff4d6d;
+            color: white;
+        }
+
+        #yes-btn:hover {
+            background-color: #c9184a;
+            transform: scale(1.1);
+        }
+
+        #no-btn {
+            background-color: #adb5bd;
+            color: white;
+            position: relative;
+            transition: all 0.3s ease-out;
+            z-index: 20;
+        }
+
+        /* Слой заморозки экрана */
+        #freeze-layer {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.2); 
+            backdrop-filter: blur(4px);
+            z-index: 999;
+            cursor: not-allowed;
+        }
+
+        /* Окно с предупреждением */
+        #image-popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border: 15px solid white;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            z-index: 1000;
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+        }
+
+        /* Текст предупреждения */
+        .warning-text {
+            color: #ff0000;
+            font-size: 2rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        #image-popup img {
+            max-width: 450px;
+            display: block;
+            border-radius: 5px;
+        }
+
+        #final-message {
+            display: none;
+            color: #d63384;
+            font-size: 2.5rem;
+            font-weight: bold;
+            animation: heartBeat 1.5s infinite;
+        }
+
+        @keyframes heartBeat {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="freeze-layer"></div>
+
+    <div id="main-container">
+        <div id="content-wrap">
+            <h1>Будешь моей валентинкой?</h1>
+            <div class="emojis">💖 😍 🥰</div>
+            
+            <div class="buttons">
+                <button id="yes-btn">Да</button>
+                <button id="no-btn">Нет</button>
+            </div>
+        </div>
+
+        <div id="final-message">
+            Ура! ❤️ Тут будет твой текст.
+        </div>
+    </div>
+
+    <div id="image-popup">
+        <div class="warning-text">stop messing with me!</div>
+        <img src="kitten.png" alt="Stop!">
+    </div>
+
+    <audio id="background-music" loop>
+        <source src="valen.mp3" type="audio/mpeg">
+        Ваш браузер не поддерживает аудио.
+    </audio>
+
+    <script>
+        const noBtn = document.getElementById('no-btn');
+        const yesBtn = document.getElementById('yes-btn');
+        const contentWrap = document.getElementById('content-wrap');
+        const finalMessage = document.getElementById('final-message');
+        const imagePopup = document.getElementById('image-popup');
+        const freezeLayer = document.getElementById('freeze-layer');
+        
+        let hoverCount = 0;
+        const limit = 5; 
+
+        noBtn.addEventListener('mouseover', () => {
+            const x = Math.random() * (window.innerWidth - noBtn.offsetWidth - 40) + 20;
+            const y = Math.random() * (window.innerHeight - noBtn.offsetHeight - 40) + 20;
+
+            noBtn.style.position = 'fixed';
+            noBtn.style.left = `${x}px`;
+            noBtn.style.top = `${y}px`;
+
+            hoverCount++;
+
+            if (hoverCount >= limit) {
+                freezeAndShow();
+            }
+        });
+
+        function freezeAndShow() {
+            freezeLayer.style.display = 'block';
+            imagePopup.style.display = 'block';
+
+            setTimeout(() => {
+                imagePopup.style.display = 'none';
+                freezeLayer.style.display = 'none';
+                
+                // Возвращаем кнопку в центр
+                noBtn.style.position = 'relative';
+                noBtn.style.left = '0';
+                noBtn.style.top = '0';
+                hoverCount = 0;
+            }, 4000); 
+        }
+
+        yesBtn.addEventListener('click', () => {
+            contentWrap.style.display = 'none';
+            finalMessage.style.display = 'block';
+            document.body.style.backgroundColor = '#ffccd5';
+            // 1. Запускаем музыку
+            const music = document.getElementById('background-music');
+            music.play().catch(error => {
+                console.log("Автовоспроизведение заблокировано браузером. Требуется взаимодействие.");
+            });
+
+            // 2. Показываем сообщение (это у тебя уже есть)
+            contentWrap.style.display = 'none';
+            finalMessage.style.display = 'block';
+            document.body.style.backgroundColor = '#ffccd5';
+        });
+    </script>
+</body>
+</html>
